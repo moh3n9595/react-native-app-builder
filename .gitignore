@@ -61,4 +61,4 @@ typings/
 .next
 
 # mac store
-.DS-store
+.DS_Store
