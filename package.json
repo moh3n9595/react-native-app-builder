@@ -1,0 +1,28 @@
+{
+  "name": "@moh3n95/react-native-app-builder",
+  "version": "0.1.0",
+  "description": "Multiple builds with different params",
+  "main": "index.js",
+  "bin": "bin.js",
+  "scripts": {
+    "test-ios": "node ./bin.js ios setting.json",
+    "test-android": "node ./bin.js android setting.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moh3n9595/react-native-app-builder.git"
+  },
+  "homepage": "https://github.com/moh3n9595/react-native-app-builder#readme",
+  "keywords": [
+    "node",
+    "react-native",
+    "bundler",
+    "builder"
+  ],
+  "author": "Mohsen Madani",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "fs-extra": "^8.1.0"
+  }
+}
