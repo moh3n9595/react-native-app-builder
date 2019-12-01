@@ -3,12 +3,9 @@ Multiple builds for [React Native](https://github.com/facebook/react-native) wit
 
 The package is in node, **not react native**!
 
----
-
 ## Advantages
 
 <p align="center">
-  <br/>
     <img src="./images/AB-test.jpg">
   <br>
   <p align="center">
@@ -20,15 +17,13 @@ The package is in node, **not react native**!
   </p>
 </p>
 
----
-
 ## Installation
 
 ```
 npm install @moh3n95/react-native-app-builder
 ```
 
-> ⚠️ **NOTE:** you can [download](https://github.com/moh3n9595/react-native-app-builder/releases) latest bundle &nbsp;  ` macOS | Windows | Linux `
+> ⚠️ **NOTE:** you can [download](https://github.com/moh3n9595/react-native-app-builder/releases) latest bundle&nbsp;  ` macOS | Windows | Linux `
 
 ## Usage
 
