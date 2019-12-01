@@ -3,11 +3,27 @@ const fs = require("fs-extra");
 const path = require("path");
 const colors = require("colors");
 
-
 const logLine = "\n---------------------------------\n";
 const MAX_BUFFER_SIZE = 1024 * 500 * 1024;
-const buildPathResolver = (platform) => path.join(".", `/builds/${platform}`);
 const ARCHIVE_NAME = "REACT_NATIVE_APP_BUILDER_ARCHIVE"; 
+const buildPathResolver = (platform) => path.join(".", `/builds/${platform}`);
+
+
+// Operating system detection :
+function osDetection() {
+    const opsys = process.platform;
+    switch(opsys) {
+        case "darwin":
+            return "MacOS";
+        case "win32":
+        case "win64":
+            return "Windows";
+        case "linux":
+            return "Linux";
+        default:
+            return "Linux";
+    }
+}
 
 // Initialize settings :
 function initialize(address, callback) {
@@ -152,6 +168,7 @@ function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, sche
 
 // Main :
 module.exports = (platform, settingFile) => {
+
     return new Promise((resolve, reject)=>{
         if(!Boolean(settingFile)) {
             console.log("\n   " + colors.bold(colors.red("error")) + " " + "invalid setting file address!" + "\n");

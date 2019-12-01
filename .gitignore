@@ -32,6 +32,9 @@ bower_components
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 builds/
 build/Release
+react-native-app-builder-linux
+react-native-app-builder-macos
+react-native-app-builder-win.exe
 
 # Dependency directories
 node_modules/
@@ -63,3 +66,4 @@ typings/
 
 # mac store
 .DS_Store
+

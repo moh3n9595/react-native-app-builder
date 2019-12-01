@@ -1,7 +1,24 @@
 # react-native-app-builder &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/moh3n9595/react-native-app-builder/blob/master/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](https://github.com/moh3n9595/react-native-app-builder/compare)
-Multiple builds for [React Native](https://github.com/facebook/react-native) with different params
+Multiple builds for [React Native](https://github.com/facebook/react-native) with different params 
 
 The package is in node, **not react native**!
+
+---
+
+## Advantages
+
+<p align="center">
+  <br/>
+    <img src="./images/AB-test.jpg">
+  <br>
+  <p align="center">
+    Parameterized Build
+  </p>
+
+  <p align="center">
+    Build multi-configuration project
+  </p>
+</p>
 
 ---
 
@@ -12,8 +29,6 @@ npm install @moh3n95/react-native-app-builder
 ```
 
 > ⚠️ **NOTE:** you can [download](https://github.com/moh3n9595/react-native-app-builder/releases) latest bundle &nbsp;  ` macOS | Windows | Linux `
-
----
 
 ## Usage
 
@@ -55,18 +70,21 @@ npm install @moh3n95/react-native-app-builder
 
 - Expected output
     ```
+    ---------------------------------
+
+    info BUILDING A...
+
+    success A FINISHED
 
     ---------------------------------
 
-    info BUILDING <BUILD_NAME>...
+    info BUILDING B...
 
-    success <BUILD_NAME> FINISHED
+    success B FINISHED
 
     ---------------------------------
-
     ```
 
----
 
 ## Arguments
 
@@ -85,11 +103,10 @@ npm install @moh3n95/react-native-app-builder
     | -------- | ---------- | -------- | ----------------------------------------------- |
     | macOS    |  `string`  | `Json`   |  `/User/<YOUR_USER_NAME>/.../<FILE_NAME>.json`  |
 
----
 
 ## Setting file example
 
-- on macOS
+- MacOS
     ```
     {
         "projectBase": "/Users/<YOUR_OS_USERNAME>/.../<RN_PROJECT_NAME>", // e.g. : /Users/apple/Desktop/test
@@ -101,14 +118,10 @@ npm install @moh3n95/react-native-app-builder
     }
     ```
 
----
-
-### Contributing
+## Contributing
 
 Thank you for your interest in contributing! Please feel free to put up a PR for any issue or feature request.
 
----
-
-### License
+## License
 
 [MIT License](https://github.com/moh3n9595/react-native-app-builder/blob/master/LICENSE) © Mohsen Madani 2019
