@@ -7,9 +7,10 @@ const colors = require("colors");
 const logLine = "\n---------------------------------\n";
 const MAX_BUFFER_SIZE = 1024 * 500 * 1024;
 const buildPathResolver = (platform) => path.join(".", `/builds/${platform}`);
+const ARCHIVE_NAME = "REACT_NATIVE_APP_BUILDER_ARCHIVE"; 
 
 // Initialize settings :
-function initialize(address) {
+function initialize(address, callback) {
     let settings = "";
     try {
         settings = fs.readFileSync(address);
@@ -21,8 +22,9 @@ function initialize(address) {
         return settings;
     }
     catch(e) {
-        console.log(e);
-        process.exit();
+        console.log(e)
+        if(callback)
+            callback(e);
     }
 }
 
@@ -35,19 +37,18 @@ function* valueGenFunc(storesArr) {
 
 
 // Builds for android :
-function buildAndroid(androidValueGen, projectBase, settingFilePath) {
-
+function buildAndroid(androidValueGen, projectBase, settingFilePath, resolve, reject) {
     const androidBuildPath = "/android/app/build/outputs/apk/release/app-release.apk";
     const {value:newValues, done} = androidValueGen.next();
     
     if(!newValues) {
         console.log(logLine);
-        process.exit();
+        return resolve();
     }
 
     if(!Boolean(newValues.buildName)) {
         console.log("\n   " + colors.bold(colors.red("error")) + " " + "buildName key is undefined | emptyString | null | false -- (Required)" + "\n");
-        process.exit();
+        return reject(new Error("buildName key is undefined | emptyString | null | false -- (Required)"));
     }
 
     console.log(logLine);
@@ -63,16 +64,24 @@ function buildAndroid(androidValueGen, projectBase, settingFilePath) {
             
             if(error) {
                 console.log(error);
-                process.exit();
+                return reject(error);
             }
 
             if(stdout.includes("BUILD SUCCESSFUL")) {
                 console.log("\n   " + colors.bold(colors.green("success")) + " " + newValues.buildName + " FINISHED");
-                fs.renameSync(path.join(projectBase,androidBuildPath), path.join(".",`/builds/android/${newValues.buildName}.apk`));
+                const newPath = path.join(".",`/builds/android/${newValues.buildName}.apk`);
+                fs.unlink(newPath, function (err) {
+                    if (err) {
+                        console.log(error);
+                        return reject(error);
+                    }
+                    fs.renameSync(path.join(projectBase,androidBuildPath), newPath);
+                });  
+                
             }
     
             if(!done) {
-                buildAndroid(androidValueGen, projectBase, settingFilePath)
+                buildAndroid(androidValueGen, projectBase, settingFilePath, resolve, reject);
             }
                 
         });
@@ -80,23 +89,23 @@ function buildAndroid(androidValueGen, projectBase, settingFilePath) {
     }
     catch(e) {
         console.log("   " + colors.red(e.message)+ "\n");
+        return reject(e);
     } 
 }
 
 // Builds for ios :
-function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, archiveName) {
-
-    const iosBuildPath = `/ios/${archiveName}.xcarchive`;
+function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject) {
+    const iosBuildPath = `/ios/${ARCHIVE_NAME}.xcarchive`;
     const {value:newValues, done} = iosValueGen.next();
     
     if(!newValues) {
         console.log(logLine);
-        process.exit();
+        return resolve();
     }
 
     if(!Boolean(newValues.buildName)) {
         console.log("\n   " + colors.bold(colors.red("error")) + " " + "buildName key is undefined | emptyString | null | false -- (Required)" + "\n");
-        process.exit();
+        return reject(new Error("buildName key is undefined | emptyString | null | false -- (Required)"));
     }
 
     console.log(logLine);
@@ -108,20 +117,28 @@ function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, sche
         settingJson = { ...newValues, buildName: undefined,  ...settingJson };
         fs.writeFileSync(path.join(projectBase,settingFilePath), JSON.stringify(settingJson));
 
-        exec(`cd ${projectBase}/ios && xcodebuild -allowProvisioningUpdates -workspace ${workspacePath}.xcworkspace -scheme \"${schemePath}\" clean archive -configuration release -sdk iphoneos -archivePath ${archiveName}.xcarchive`, {maxBuffer: MAX_BUFFER_SIZE}, (error, stdout, stderr)=> {
+        exec(`cd ${projectBase}/ios && xcodebuild -allowProvisioningUpdates -workspace ${workspacePath}.xcworkspace -scheme \"${schemePath}\" clean archive -configuration release -sdk iphoneos -archivePath ${ARCHIVE_NAME}.xcarchive`, {maxBuffer: MAX_BUFFER_SIZE}, (error, stdout, stderr)=> {
             
             if(error) {
                 console.log(error);
-                process.exit();
+                return reject(error);
             }
 
             if(stdout.includes("ARCHIVE SUCCEEDED")) {
                 console.log("\n   " + colors.bold(colors.green("success")) + " " + newValues.buildName + " FINISHED");
-                fs.renameSync(path.join(projectBase,iosBuildPath), path.join(".",`/builds/ios/${newValues.buildName}.xcarchive`));
+                const newPath = path.join(".",`/builds/ios/${newValues.buildName}.xcarchive`);
+                fs.unlink(newPath, function (err) {
+                    if (err) {
+                        console.log(error);
+                        return reject(error);
+                    }
+                    fs.renameSync(path.join(projectBase,iosBuildPath), newPath);
+                });  
+                
             }
     
             if(!done) {
-                buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, archiveName)
+                buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject)
             }
                 
         });
@@ -129,30 +146,41 @@ function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, sche
     }
     catch(e) {
         console.log("   " + colors.red(e.message)+ "\n");
+        return reject(e);
     } 
 }
 
 // Main :
 module.exports = (platform, settingFile) => {
+    return new Promise((resolve, reject)=>{
+        if(!Boolean(settingFile)) {
+            console.log("\n   " + colors.bold(colors.red("error")) + " " + "invalid setting file address!" + "\n");
+            reject(new Error("invalid setting file address!"));
+        }
+        
+        const { projectBase, settingFilePath, androidParams, iosParams, workspacePath, schemePath } = initialize(settingFile, reject);
 
-    if(!Boolean(settingFile)) {
-        console.log("\n   " + colors.bold(colors.red("error")) + " " + "invalid setting file address!" + "\n");
-        process.exit();
-    }
-    
-    const { projectBase, settingFilePath, androidParams, iosParams, workspacePath, schemePath, archiveName } = initialize(settingFile);
-    
-    switch (platform) {
-        case "android":
-            fs.mkdirSync(buildPathResolver("android"), { recursive: true });
-            const androidValueGen = valueGenFunc(androidParams);
-            buildAndroid(androidValueGen, projectBase, settingFilePath);
-            break;
-        case "ios":
-            fs.mkdirSync(buildPathResolver("ios"), { recursive: true });
-            const iosValueGen = valueGenFunc(iosParams);
-            buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, archiveName);
-            break;
-    }
-    
+        const iosValueGen = valueGenFunc(iosParams);
+        const androidValueGen = valueGenFunc(androidParams);
+
+        switch (platform) {
+            case "android":
+                fs.mkdirSync(buildPathResolver("android"), { recursive: true });
+                buildAndroid(androidValueGen, projectBase, settingFilePath, resolve, reject);
+                break;
+            case "ios":
+                fs.mkdirSync(buildPathResolver("ios"), { recursive: true });
+                buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject);
+                break;
+            case "both":
+                fs.mkdirSync(buildPathResolver("android"), { recursive: true });
+                buildAndroid(androidValueGen, projectBase, settingFilePath, (result) => {
+                    fs.mkdirSync(buildPathResolver("ios"), { recursive: true });
+                    buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject);
+                }, reject);
+                break;
+
+                
+        }
+    });
 }
