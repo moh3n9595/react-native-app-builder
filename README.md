@@ -97,6 +97,7 @@ npm install @moh3n95/react-native-app-builder
     |    OS    |    Type    | FileType |                     Sample                      |
     | -------- | ---------- | -------- | ----------------------------------------------- |
     | macOS    |  `string`  | `Json`   |  `/User/<YOUR_USER_NAME>/.../<FILE_NAME>.json`  |
+    | Windows  |  `string`  | `Json`   |  `<YOUR_DRIVE_NAME>://.../<FILE_NAME>.json`     |
 
 
 ## Setting file example
@@ -108,6 +109,16 @@ npm install @moh3n95/react-native-app-builder
         "settingFilePath": "<YOUR_JSON_SETTING_IN_REACT_NATIVE_PROJECT>", // e.g. : ./app.json
         "workspacePath": "<YOUR_IOS_WORKSPACE>", // e.g. : ./test
         "schemePath": "<YOUR_IOS_SCHEME>", // e.g. : test 
+
+        ...
+    }
+    ```
+
+- Windows
+    ```
+    {
+        "projectBase": "<YOUR_DRIVE_NAME>://.../<RN_PROJECT_NAME>", // e.g. : C://test
+        "settingFilePath": "<YOUR_JSON_SETTING_IN_REACT_NATIVE_PROJECT>", // e.g. : ./app.json
 
         ...
     }

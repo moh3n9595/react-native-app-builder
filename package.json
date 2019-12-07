@@ -19,9 +19,13 @@
     "bundler",
     "builder"
   ],
-  "author": "Mohsen Madani",
+  "author": {
+    "name": "Mohsen Madani",
+    "email": "mohsenando@gmail.com"
+  },
   "license": "MIT",
   "dependencies": {
+    "boxen": "^4.1.0",
     "colors": "^1.4.0",
     "fs-extra": "^8.1.0"
   }
