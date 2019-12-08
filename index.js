@@ -205,7 +205,7 @@ function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, sche
 }
 
 // Main :
-module.exports = (platform, settingFile) => {
+function main(platform, settingFile) {
 
     startLog()
     
@@ -245,3 +245,5 @@ module.exports = (platform, settingFile) => {
         }
     });
 }
+
+module.exports = main;
