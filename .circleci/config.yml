@@ -30,9 +30,9 @@ jobs:
       - checkout
       
       - run:
-        name: Android build
-        command: | 
-        echo '{ "projectBase": "/home/circleci/project", "androidParams": "[\"{\"buildName\":\"TEST\", \"testVariable\": \"TEST\"}\"]" }' > setting.json
+          name: Android build
+          command: | 
+            echo '{ "projectBase": "/home/circleci/project", "androidParams": "[\"{\"buildName\":\"TEST\", \"testVariable\": \"TEST\"}\"]" }' > setting.json
   
   rn-init:
     docker:
