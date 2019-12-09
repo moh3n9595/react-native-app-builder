@@ -30,6 +30,9 @@ jobs:
     steps:
       - checkout
       
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
+      
       - run:
           name: Set json
           command: | 
@@ -90,10 +93,10 @@ workflows:
       - rn-init
       - rn-build-android:
           requires:
-            - rn-init
+            - node-test
       - node-test:
           requires:
-            - rn-build-android
+            - rn-init
       - node-build:
           requires:
             - node-test
