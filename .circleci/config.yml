@@ -12,7 +12,12 @@ jobs:
       - run:
           name: Install npm
           command: npm install
+          
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
           paths:
             - node_modules
+            
+      - run:
+          name: Binary compile
+          command: pkg .
