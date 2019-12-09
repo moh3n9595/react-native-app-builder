@@ -22,6 +22,18 @@ jobs:
           name: Eslint
           command: ./node_modules/.bin/eslint *.js **/*.js
           
+  rn-build-android:
+    docker:
+      - image: circleci/node:8-browsers
+      
+    steps:
+      - checkout
+      
+      - run:
+        name: Android build
+        command: | 
+        echo '{ "projectBase": "/home/circleci/project", "androidParams": "[\"{\"buildName\":\"TEST\", \"testVariable\": \"TEST\"}\"]" }' > setting.json
+  
   rn-init:
     docker:
       - image: circleci/node:8-browsers
@@ -70,9 +82,12 @@ workflows:
   test-build:
     jobs:
       - rn-init
-      - node-test:
+      - rn-build-android:
           requires:
             - rn-init
+      - node-test:
+          requires:
+            - rn-build-android
       - node-build:
           requires:
             - node-test
