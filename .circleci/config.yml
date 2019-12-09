@@ -10,8 +10,8 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
       
       - run:
-          name: Install npm
-          command: npm install
+          name: Install npm & pkg
+          command: npm install && sudo npm install -g pkg
           
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
@@ -21,3 +21,6 @@ jobs:
       - run:
           name: Binary compile
           command: pkg .
+          
+      - store_artifacts:
+        path: /pkg_build
