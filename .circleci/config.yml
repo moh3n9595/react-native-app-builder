@@ -67,7 +67,7 @@ workflows:
   test-build:
     jobs:
       - rn-init
-      - node-test
+      - node-test:
           requires:
             - rn-init
       - node-build:
