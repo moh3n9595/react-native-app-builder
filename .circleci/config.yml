@@ -1,0 +1,52 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/node:8-browsers
+    steps:
+      - checkout
+      
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
+      
+      - run:
+          name: Install npm
+          command: npm i
+          
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
+          paths:
+            - node_modules
+            
+      - run:
+          name: Eslint
+          command: ./node_modules/.bin/eslint *.js **/*.js
+          
+  build:
+    docker:
+      - image: circleci/node:8-browsers
+    steps:
+      - checkout
+      
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
+      
+      - run:
+          name: Install pkg
+          command: sudo npm i -g pkg
+            
+      - run:
+          name: Binary compile
+          command: pkg . --out-path ./binary_builds
+          
+      - store_artifacts:
+          path: ./binary_builds
+          
+workflows:
+  version: 2
+  test-build:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test

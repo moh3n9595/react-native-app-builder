@@ -1,5 +1,7 @@
-# react-native-app-builder &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/moh3n9595/react-native-app-builder/blob/master/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](https://github.com/moh3n9595/react-native-app-builder/compare)
+# react-native-app-builder &middot; [![Circle CI](https://circleci.com/gh/moh3n9595/react-native-app-builder/tree/master.svg?style=shield)](https://circleci.com/gh/moh3n9595/react-native-app-builder) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/moh3n9595/react-native-app-builder/blob/master/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](https://github.com/moh3n9595/react-native-app-builder/compare)
 Multiple builds for [React Native](https://github.com/facebook/react-native) with different params 
+
+
 
 The package is in node, **not react native**!
 
