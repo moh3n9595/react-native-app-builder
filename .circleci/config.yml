@@ -29,18 +29,16 @@ jobs:
       - checkout
       
       - restore_cache:
-          key: dependency-cache-{{ checksum "./AppBuilderTest/package.json" }}-{{ arch }}
-          paths:
-            - ./AppBuilderTest
+          key: dependency-cache-{{ checksum "AppBuilderTest/package.json" }}-{{ arch }}
         
       - run:
           name: React native init
           command: npx react-native init AppBuilderTest && cd ./AppBuilderTest/android
           
       - save_cache:
-          key: dependency-cache-{{ checksum "./AppBuilderTest/package.json" }}-{{ arch }}
+          key: dependency-cache-{{ checksum "AppBuilderTest/package.json" }}-{{ arch }}
           paths:
-            - ./AppBuilderTest
+            - AppBuilderTest
           
   node-build:
     docker:
