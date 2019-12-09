@@ -25,14 +25,20 @@ jobs:
   rn-build-android:
     docker:
       - image: circleci/node:8-browsers
+      - image: circleci/android:api-27-node8-alpha
       
     steps:
       - checkout
       
       - run:
-          name: Android build
+          name: Set json
           command: | 
             echo '{ "projectBase": "/home/circleci/project", "androidParams": "[\"{\"buildName\":\"TEST\", \"testVariable\": \"TEST\"}\"]" }' > setting.json
+      - run:
+          name: Android build
+          command: node ./bin.js android setting.json
+            
+  
   
   rn-init:
     docker:
