@@ -23,4 +23,4 @@ jobs:
           command: pkg .
           
       - store_artifacts:
-          path: /pkg_build
+          path: ./
