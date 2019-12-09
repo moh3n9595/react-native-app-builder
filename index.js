@@ -2,8 +2,8 @@ const { exec } = require("child_process");
 const fs = require("fs-extra");
 const path = require("path");
 const colors = require("colors");
-const boxen = require('boxen');
-const { name:packageName, version:packageVersion, description:packageDescription } = require('./package.json');
+const boxen = require("boxen");
+const { name:packageName, version:packageVersion, description:packageDescription } = require("./package.json");
 
 const logLine = colors.gray("\n---------------------------------");
 const MAX_BUFFER_SIZE = 1024 * 500 * 1024;
@@ -66,7 +66,7 @@ function initialize(address, callback) {
         settings = fs.readFileSync(address);
         settings = JSON.parse(settings);
         if(!settings) {
-            console.log(errorBeautifier("invalid setting file!"))
+            console.log(errorBeautifier("invalid setting file!"));
             if(callback)
                 callback(new Error("invalid setting file!"));
         }
@@ -192,7 +192,7 @@ function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, sche
             }
     
             if(!done) {
-                buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject)
+                buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject);
             }
                 
         });
@@ -207,7 +207,7 @@ function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, sche
 // Main :
 function main(platform, settingFile) {
 
-    startLog()
+    startLog();
     
     return new Promise((resolve, reject)=>{
         if(!Boolean(settingFile)) {
