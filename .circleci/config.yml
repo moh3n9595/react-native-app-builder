@@ -5,9 +5,13 @@ jobs:
       - image: circleci/node:8-browsers
     steps:
       - checkout
+      
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
+      
       - run:
-        name: Install npm
-        command: npm install
+          name: Install npm
+          command: npm install
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
           paths:
