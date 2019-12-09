@@ -2,6 +2,6 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/ruby:2.4.1
-  steps:
-    - run: echo "A first hello"
+      - image: circleci/node:8-browsers
+    steps:
+      - run: echo "A first hello"
