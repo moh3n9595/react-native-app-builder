@@ -34,9 +34,9 @@ jobs:
       - run:
           name: React native init
           command: |
-            if [ ! -d "/AppBuilderTest" ] 
+            if [ ! -d "AppBuilderTest" ] 
             then
-              npx react-native init AppBuilderTest && cd ./AppBuilderTest/android
+              npx react-native init AppBuilderTest --npm && cd ./AppBuilderTest/android
             fi
             
           
