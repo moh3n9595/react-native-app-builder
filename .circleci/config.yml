@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  test:
+  node-test:
     docker:
       - image: circleci/node:8-browsers
     steps:
@@ -10,7 +10,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
       
       - run:
-          name: Install npm
+          name: Install NPM
           command: npm i
           
       - save_cache:
@@ -22,7 +22,27 @@ jobs:
           name: Eslint
           command: ./node_modules/.bin/eslint *.js **/*.js
           
-  build:
+  rn-init:
+    docker:
+      - image: circleci/node:8-browsers
+    steps:
+      - checkout
+      
+      - restore_cache:
+          key: dependency-cache-{{ checksum "./AppBuilderTest/package.json" }}-{{ arch }}
+          paths:
+            - ./AppBuilderTest
+        
+      - run:
+          name: React native init
+          command: npx react-native init AppBuilderTest && cd ./AppBuilderTest/android
+          
+      - save_cache:
+          key: dependency-cache-{{ checksum "./AppBuilderTest/package.json" }}-{{ arch }}
+          paths:
+            - ./AppBuilderTest
+          
+  node-build:
     docker:
       - image: circleci/node:8-browsers
     steps:
@@ -32,7 +52,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
       
       - run:
-          name: Install pkg
+          name: Install PKG
           command: sudo npm i -g pkg
             
       - run:
@@ -46,7 +66,10 @@ workflows:
   version: 2
   test-build:
     jobs:
-      - test
-      - build:
+      - rn-init
+      - node-test
           requires:
-            - test
+            - rn-init
+      - node-build:
+          requires:
+            - node-test
