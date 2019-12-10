@@ -34,7 +34,7 @@ jobs:
   rn-build-android:
     docker:
       - image: circleci/node:10.12
-      - image: circleci/android:api-28-node8
+      - image: circleci/android:api-28-node
       
     steps:
       - checkout
