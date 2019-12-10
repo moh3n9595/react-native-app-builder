@@ -2,7 +2,7 @@ version: 2
 jobs:
   node-init:
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.12
     steps:
       - checkout
     
@@ -20,7 +20,7 @@ jobs:
     
   node-test:
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.12
     steps:
       - checkout
       
@@ -33,28 +33,48 @@ jobs:
           
   rn-build-android:
     docker:
-      - image: circleci/node:8-browsers
-      - image: circleci/android:api-27-node8-alpha
+      - image: circleci/android:api-28-node
+      - image: circleci/node:10.12
+      - image: circleci/openjdk:8-jdk
       
     steps:
       - checkout
+
+      - restore_cache:
+          key: dependency-cache-react-native-{{ arch }}
       
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
+          
+      - restore_cache:
+          key: jars-{{ arch }} 
+         
+      - run:
+          name: Chmod permissions
+          command: sudo chmod +x ./AppBuilderTest/android/gradlew 
+      
+      - run:
+          name: Download Dependencies
+          command: cd /home/circleci/project/AppBuilderTest/android && ./gradlew androidDependencies
+        
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ arch }} 
       
       - run:
           name: Set json
           command: | 
-            echo '{ "projectBase": "/home/circleci/project", "androidParams": "[\"{\"buildName\":\"TEST\", \"testVariable\": \"TEST\"}\"]" }' > setting.json
+            echo '{"projectBase": "/home/circleci/project/AppBuilderTest","settingFilePath":"/app.json","workspacePath":"test","schemePath":"test","androidParams":[{"buildName":"BUILD_TEST","customParam":"testValue"}],"iosParams":[]}' > setting.json
+      
       - run:
           name: Android build
           command: node ./bin.js android setting.json
-            
-  
   
   rn-init:
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.12
+      
     steps:
       - checkout
       
@@ -66,7 +86,7 @@ jobs:
           command: |
             if [ ! -d "AppBuilderTest" ] 
             then
-              npx react-native init AppBuilderTest --npm && cd ./AppBuilderTest/android
+              npx react-native init AppBuilderTest --npm
             fi
             
           
@@ -77,7 +97,8 @@ jobs:
           
   node-build:
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.12
+      
     steps:
       - checkout
       
@@ -111,4 +132,4 @@ workflows:
             - rn-init
       - node-build:
           requires:
-            - node-test
+            - rn-build-android
