@@ -50,12 +50,12 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
           
       - run:
-        name: Chmod permissions
-        command: sudo chmod +x ./AppBuilderTest/android/gradlew 
+          name: Chmod permissions
+          command: sudo chmod +x ./AppBuilderTest/android/gradlew 
         
       - run:
-        name: Download Dependencies
-        command: ./AppBuilderTest/android/gradlew androidDependencies
+          name: Download Dependencies
+          command: ./AppBuilderTest/android/gradlew androidDependencies
           
       - save_cache:
           key: jars-{{ arch }}
@@ -76,6 +76,7 @@ jobs:
   rn-init:
     docker:
       - image: circleci/node:10.12
+      
     steps:
       - checkout
       
@@ -99,6 +100,7 @@ jobs:
   node-build:
     docker:
       - image: circleci/node:10.12
+      
     steps:
       - checkout
       
