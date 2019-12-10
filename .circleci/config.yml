@@ -34,7 +34,7 @@ jobs:
   rn-build-android:
     docker:
       - image: circleci/node:10.12
-      - image: circleci/android:api-27-node8-alpha
+      - image: circleci/android:api-28-node8
       
     steps:
       - checkout
@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Set json
           command: | 
-            echo '{"projectBase": "/home/circleci/project", "androidParams": [{"buildName":"TEST", "testVariable": "TEST"}]}' > setting.json
+            echo '{"projectBase": "/home/circleci/project","settingFilePath":"/app.json","workspacePath":"test","schemePath":"test","androidParams":[{"buildName":"BUILD_TEST","customParam":"testValue"}],"iosParams":[]}' > setting.json
       - run:
           name: Android build
           command: node ./bin.js android setting.json
@@ -66,7 +66,7 @@ jobs:
           command: |
             if [ ! -d "AppBuilderTest" ] 
             then
-              npx react-native init AppBuilderTest --npm && cd ./AppBuilderTest/android
+              npx react-native init AppBuilderTest --npm
             fi
             
           
@@ -111,4 +111,4 @@ workflows:
             - rn-init
       - node-build:
           requires:
-            - node-test
+            - rn-build-android
