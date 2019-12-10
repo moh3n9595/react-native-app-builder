@@ -69,3 +69,4 @@ typings/
 
 # CI/CD
 AppBuilderTest/*
+setting.json
