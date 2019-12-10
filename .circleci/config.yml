@@ -46,9 +46,21 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
           
+      - restore_cache:
+          key: jars-{{ arch }} 
+         
       - run:
           name: Chmod permissions
           command: sudo chmod +x ./AppBuilderTest/android/gradlew 
+      
+      - run:
+          name: Download Dependencies
+          command: cd /home/circleci/project/AppBuilderTest/android && ./gradlew androidDependencies
+        
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ arch }} 
       
       - run:
           name: Set json
@@ -57,9 +69,7 @@ jobs:
       
       - run:
           name: Android build
-          command: cd /home/circleci/project/AppBuilderTest/android && ./gradlew assembleRelease
-            
-  
+          command: node ./bin.js android setting.json
   
   rn-init:
     docker:
