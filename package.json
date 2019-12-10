@@ -1,6 +1,6 @@
 {
   "name": "@moh3n95/react-native-app-builder",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Multiple builds with different params",
   "main": "index.js",
   "types": "index.d.ts",
