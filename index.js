@@ -1,4 +1,4 @@
-const { exec } = require("child_process");
+const { exec, execSync } = require("child_process");
 const fs = require("fs-extra");
 const path = require("path");
 const colors = require("colors");
@@ -98,7 +98,7 @@ function buildAndroid(androidValueGen, projectBase, settingFilePath, resolve, re
         return resolve();
     }
 
-    if(!Boolean(newValues.buildName)) {
+    if(!newValues.buildName) {
         console.log(errorBeautifier("buildName key is undefined | emptyString | null | false -- (Required)"));
         return reject(new Error("buildName key is undefined | emptyString | null | false -- (Required)"));
     }
@@ -115,7 +115,7 @@ function buildAndroid(androidValueGen, projectBase, settingFilePath, resolve, re
         if(OS == "Windows")
 			execSync(projectBase.split(":")[0] + ":");
 		
-        exec(`cd ${projectBase}/android && ${OS != "Windows"?"./":""}gradlew assembleRelease`, {maxBuffer: MAX_BUFFER_SIZE}, (error, stdout, stderr)=> {
+        exec(`cd ${projectBase}/android && ${OS != "Windows"?"./":""}gradlew assembleRelease`, {maxBuffer: MAX_BUFFER_SIZE}, (error, stdout)=> {
             
             if(error) {
                 console.log(errorBeautifier(error));
@@ -161,7 +161,7 @@ function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, sche
         return resolve();
     }
 
-    if(!Boolean(newValues.buildName)) {
+    if(!newValues.buildName) {
         console.log(errorBeautifier("buildName key is undefined | emptyString | null | false -- (Required)"));
         return reject(new Error("buildName key is undefined | emptyString | null | false -- (Required)"));
     }
@@ -175,10 +175,11 @@ function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, sche
         settingJson = { ...settingJson, ...newValues, buildName: undefined };
         fs.writeFileSync(path.join(projectBase,settingFilePath), JSON.stringify(settingJson));
 
-        exec(`cd ${projectBase}/ios && xcodebuild -allowProvisioningUpdates -workspace ${workspacePath}.xcworkspace -scheme \"${schemePath}\" clean archive -configuration release -sdk iphoneos -archivePath ${ARCHIVE_NAME}.xcarchive`, {maxBuffer: MAX_BUFFER_SIZE}, (error, stdout, stderr)=> {
+        // eslint-disable-next-line no-useless-escape
+        exec(`cd ${projectBase}/ios && xcodebuild -allowProvisioningUpdates -workspace ${workspacePath}.xcworkspace -scheme \"${schemePath}\" clean archive -configuration release -sdk iphoneos -archivePath ${ARCHIVE_NAME}.xcarchive`, {maxBuffer: MAX_BUFFER_SIZE}, (error, stdout)=> {
             
             if(error) {
-                console.log(errorBeautifier(e));
+                console.log(errorBeautifier(error));
                 return reject(error);
             }
 
@@ -210,7 +211,7 @@ function main(platform, settingFile) {
     startLog();
     
     return new Promise((resolve, reject)=>{
-        if(!Boolean(settingFile)) {
+        if(!settingFile) {
             console.log(errorBeautifier("invalid setting file address!"));
             reject(new Error("invalid setting file address!"));
         }
@@ -235,7 +236,7 @@ function main(platform, settingFile) {
                 break;
             case "both":
                 fs.mkdirSync(buildPathResolver("android"), { recursive: true });
-                buildAndroid(androidValueGen, projectBase, settingFilePath, (result) => {
+                buildAndroid(androidValueGen, projectBase, settingFilePath, () => {
                     fs.mkdirSync(buildPathResolver("ios"), { recursive: true });
                     buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject);
                 }, reject);

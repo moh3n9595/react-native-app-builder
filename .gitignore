@@ -67,3 +67,5 @@ typings/
 # mac store
 .DS_Store
 
+# CI/CD
+AppBuilderTest/*
