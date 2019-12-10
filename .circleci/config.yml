@@ -2,7 +2,7 @@ version: 2
 jobs:
   node-init:
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.12
     steps:
       - checkout
     
@@ -20,7 +20,7 @@ jobs:
     
   node-test:
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.12
     steps:
       - checkout
       
@@ -33,7 +33,7 @@ jobs:
           
   rn-build-android:
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.12
       - image: circleci/android:api-27-node8-alpha
       
     steps:
@@ -54,7 +54,7 @@ jobs:
   
   rn-init:
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.12
     steps:
       - checkout
       
@@ -77,7 +77,7 @@ jobs:
           
   node-build:
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.12
     steps:
       - checkout
       
