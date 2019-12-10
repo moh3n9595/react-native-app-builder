@@ -1,11 +1,11 @@
 version: 2
 jobs:
-  node-test:
+  node-init:
     docker:
       - image: circleci/node:8-browsers
     steps:
       - checkout
-      
+    
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
       
@@ -17,6 +17,15 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
           paths:
             - node_modules
+    
+  node-test:
+    docker:
+      - image: circleci/node:8-browsers
+    steps:
+      - checkout
+      
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
             
       - run:
           name: Eslint
@@ -90,7 +99,10 @@ workflows:
   version: 2
   test-build:
     jobs:
-      - rn-init
+      - node-init
+      - rn-init:
+          requires:
+            - node-init
       - rn-build-android:
           requires:
             - node-test
