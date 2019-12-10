@@ -52,7 +52,7 @@ jobs:
             echo '{"projectBase": "/home/circleci/project/AppBuilderTest","settingFilePath":"/app.json","workspacePath":"test","schemePath":"test","androidParams":[{"buildName":"BUILD_TEST","customParam":"testValue"}],"iosParams":[]}' > setting.json
       - run:
           name: Android build
-          command: node ./bin.js android setting.json
+          command: cd /home/circleci/project/AppBuilderTest && ./gradlew assembleRelease
             
   
   
