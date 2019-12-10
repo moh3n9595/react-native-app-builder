@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Set json
           command: | 
-            echo '{ "projectBase": "/home/circleci/project", "androidParams": "[\"{\"buildName\":\"TEST\", \"testVariable\": \"TEST\"}\"]" }' > setting.json
+            echo '{"projectBase": "/home/circleci/project", "androidParams": [{"buildName":"TEST", "testVariable": "TEST"}]}' > setting.json
       - run:
           name: Android build
           command: node ./bin.js android setting.json
