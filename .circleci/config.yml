@@ -40,6 +40,9 @@ jobs:
       - checkout
       
       - restore_cache:
+          key: dependency-cache-react-native-{{ arch }}
+      
+      - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
       
       - run:
