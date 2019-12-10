@@ -33,23 +33,40 @@ jobs:
           
   rn-build-android:
     docker:
-      - image: circleci/node:10.12
       - image: circleci/android:api-28-node
+      - image: circleci/node:10.12
       - image: circleci/openjdk:8-jdk
       
     steps:
       - checkout
       
       - restore_cache:
+          key: jars-{{ arch }}
+
+      - restore_cache:
           key: dependency-cache-react-native-{{ arch }}
       
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
+          
+      - run:
+        name: Chmod permissions
+        command: sudo chmod +x ./AppBuilderTest/android/gradlew 
+        
+      - run:
+        name: Download Dependencies
+        command: ./AppBuilderTest/android/gradlew androidDependencies
+          
+      - save_cache:
+          key: jars-{{ arch }}
+          paths:
+            - AppBuilderTest/android/.gradle
       
       - run:
           name: Set json
           command: | 
             echo '{"projectBase": "/home/circleci/project/AppBuilderTest","settingFilePath":"/app.json","workspacePath":"test","schemePath":"test","androidParams":[{"buildName":"BUILD_TEST","customParam":"testValue"}],"iosParams":[]}' > setting.json
+      
       - run:
           name: Android build
           command: cd /home/circleci/project/AppBuilderTest && ./gradlew assembleRelease
