@@ -96,10 +96,11 @@ npm install @moh3n95/react-native-app-builder
 
 - Setting file path
 
-    |    OS    |    Type    | FileType |                     Sample                      |
-    | -------- | ---------- | -------- | ----------------------------------------------- |
-    | macOS    |  `string`  | `Json`   |  `/User/<YOUR_USER_NAME>/.../<FILE_NAME>.json`  |
-    | Windows  |  `string`  | `Json`   |  `<YOUR_DRIVE_NAME>://.../<FILE_NAME>.json`     |
+    |    OS    |    Type    | FileType |                     Sample                        |
+    | -------- | ---------- | -------- | ------------------------------------------------- |
+    | macOS    |  `string`  | `Json`   |  `/User/<YOUR_USER_NAME>/.../<FILE_NAME>.json`    |
+    | Windows  |  `string`  | `Json`   |  `<YOUR_DRIVE_NAME>://.../<FILE_NAME>.json`       |
+    | Any      |  `object`  | `None`   |  `{ projectBase, ... } // Only unbundled version` |
 
 
 ## Setting file example
