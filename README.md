@@ -55,8 +55,8 @@ npm install @moh3n95/react-native-app-builder
     // import
     const RNBuilder = require("@moh3n95/react-native-app-builder");
 
-    RNBuilder(<PLATFORM>, <SETTING_FILE_PATH>).then(()=>{
-        // Build successed
+    RNBuilder(<PLATFORM>, <SETTING_FILE_PATH_OR_DIRECTLY_OBJ>).then(()=>{
+        // Build was successful
     })
     .catch(e=>{
         // Raised error
@@ -103,7 +103,6 @@ npm install @moh3n95/react-native-app-builder
 
 
 ## Setting file example
-
 - MacOS
     ```
     {

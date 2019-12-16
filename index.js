@@ -10,11 +10,38 @@ const MAX_BUFFER_SIZE = 1024 * 500 * 1024;
 const ARCHIVE_NAME = "REACT_NATIVE_APP_BUILDER_ARCHIVE"; 
 const buildPathResolver = (platform) => path.join(".", `/builds/${platform}`);
 
+// Validate and create platform parameters :
+function settingFileParameters(platform, mainObj, reject) {
+    const finalArr = [];
+
+    if(platform == "android" || platform == "both") {
+        if(!mainObj.androidParams) {
+            console.log(errorBeautifier("androidParams is undefined!"));
+            reject(new Error("androidParams is undefined!"));
+        }
+        finalArr.push(valueGenFunc(mainObj.androidParams));
+    }
+    else {
+        finalArr.push(null);
+    }
+    if(platform == "ios" || platform == "both") {
+        if(!mainObj.iosParams) {
+            console.log(errorBeautifier("iosParams is undefined!"));
+            reject(new Error("iosParams is undefined!"));
+        }
+        finalArr.push(valueGenFunc(mainObj.iosParams));
+    }
+    else {
+        finalArr.push(null);
+    }
+
+    return finalArr;
+}
+
 // Package info log :
 function startLog() {
     console.log("\n" + boxen(packageName + " v" + packageVersion + "\n\n " + packageDescription, {padding: 1, borderColor: "yellow"}));
 }
-
 
 // read error better :
 function errorBeautifier(err) {
@@ -39,6 +66,9 @@ function beautyLog(message, type = "warn") {
         case "success":
             console.log("\n   " + colors.bold(colors.green("success")) + " " + message);
             break;
+        default:
+            console.log("\n   " + message);
+            break;
     }
 }
 
@@ -55,6 +85,26 @@ function osDetection() {
             return "Linux";
         default:
             return "Linux";
+    }
+}
+
+// Create obj for builders :
+function BuildObjectResolver(mainObj, platform) {
+    switch (platform) {
+        case "android":
+            return {
+                projectBase: mainObj.projectBase,
+                settingFilePath: mainObj.settingFilePath,
+            };
+        case "ios":
+            return {
+                projectBase: mainObj.projectBase, 
+                settingFilePath: mainObj.settingFilePath, 
+                workspacePath: mainObj.workspacePath, 
+                schemePath: mainObj.schemePath
+            };
+        default:
+            return {};
     }
 }
 
@@ -86,9 +136,8 @@ function* valueGenFunc(storesArr) {
     }
 }
 
-
 // Builds for android :
-function buildAndroid(androidValueGen, projectBase, settingFilePath, resolve, reject) {
+function buildAndroid(androidValueGen, { projectBase, settingFilePath }, resolve, reject) {
     const androidBuildPath = "/android/app/build/outputs/apk/release/app-release.apk";
     const {value:newValues, done} = androidValueGen.next();
     const OS = osDetection();
@@ -134,7 +183,7 @@ function buildAndroid(androidValueGen, projectBase, settingFilePath, resolve, re
             }
     
             if(!done) {
-                buildAndroid(androidValueGen, projectBase, settingFilePath, resolve, reject);
+                buildAndroid(androidValueGen, { projectBase, settingFilePath }, resolve, reject);
             }
                 
         });
@@ -146,9 +195,8 @@ function buildAndroid(androidValueGen, projectBase, settingFilePath, resolve, re
     } 
 }
 
-
 // Builds for ios :
-function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject) {
+function buildIOS(iosValueGen, { projectBase, settingFilePath, workspacePath, schemePath }, resolve, reject) {
     if(osDetection() != "MacOS") {
         beautyLog("ios need mac operating system!", "warn");
 		resolve(true);
@@ -193,7 +241,7 @@ function buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, sche
             }
     
             if(!done) {
-                buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject);
+                buildIOS(iosValueGen, { projectBase, settingFilePath, workspacePath, schemePath }, resolve, reject);
             }
                 
         });
@@ -211,20 +259,21 @@ function main(platform, settingFile) {
     startLog();
     
     return new Promise((resolve, reject)=>{
+
         if(!settingFile) {
             console.log(errorBeautifier("invalid setting file address!"));
             reject(new Error("invalid setting file address!"));
         }
-        
-        const { projectBase, settingFilePath, androidParams, iosParams, workspacePath, schemePath } = initialize(settingFile, reject);
-        
-        const iosValueGen = valueGenFunc(iosParams);
-        const androidValueGen = valueGenFunc(androidParams);
+        else if (typeof settingFile == "string")
+            settingFile = initialize(settingFile, reject);
+
+        const [ androidValueGen, iosValueGen ] = settingFileParameters(platform, settingFile, reject);
+
 
         switch (platform) {
             case "android":
                 fs.mkdirSync(buildPathResolver("android"), { recursive: true });
-                buildAndroid(androidValueGen, projectBase, settingFilePath, resolve, reject);
+                buildAndroid(androidValueGen, BuildObjectResolver(settingFile ,"android"), resolve, reject);
                 break;
             case "ios":
                 if(osDetection() != "MacOS") {
@@ -232,17 +281,15 @@ function main(platform, settingFile) {
                     return reject(new Error("ios need mac operating system!"));
                 }
                 fs.mkdirSync(buildPathResolver("ios"), { recursive: true });
-                buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject);
+                buildIOS(iosValueGen, BuildObjectResolver(settingFile ,"ios"), resolve, reject);
                 break;
             case "both":
                 fs.mkdirSync(buildPathResolver("android"), { recursive: true });
-                buildAndroid(androidValueGen, projectBase, settingFilePath, () => {
+                buildAndroid(androidValueGen, BuildObjectResolver(settingFile ,"android"), () => {
                     fs.mkdirSync(buildPathResolver("ios"), { recursive: true });
-                    buildIOS(iosValueGen, projectBase, settingFilePath, workspacePath, schemePath, resolve, reject);
+                    buildIOS(iosValueGen, BuildObjectResolver(settingFile ,"ios"), resolve, reject);
                 }, reject);
                 break;
-
-                
         }
     });
 }
