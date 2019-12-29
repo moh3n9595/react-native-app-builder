@@ -133,3 +133,10 @@ Thank you for your interest in contributing! Please feel free to put up a PR for
 ## License
 
 [MIT License](https://github.com/moh3n9595/react-native-app-builder/blob/master/LICENSE) © Mohsen Madani 2019
+
+## Todo
+- Enable Hermes
+- Change version code
+- Change build number
+- Convert xarchive to IPA
+- Add Test & Deploy
