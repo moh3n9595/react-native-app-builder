@@ -130,6 +130,21 @@ npm install @moh3n95/react-native-app-builder
 
 Thank you for your interest in contributing! Please feel free to put up a PR for any issue or feature request.
 
+## Todo
+- Enable Hermes
+- Change version code
+- Change build number
+- Convert xarchive to IPA
+- Add Test & Deploy
+
+## Give me a Star
+
+If you think this project is helpful just give me a ⭐️ Star is enough because i don't drink coffee 😃
+
 ## License
 
-[MIT License](https://github.com/moh3n9595/react-native-app-builder/blob/master/LICENSE) © Mohsen Madani 2019
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/moh3n9595/react-native-app-builder/blob/master/LICENSE) file for details
+
+## Author
+
+Made with ❤️ by [Mohsen Madani](https://github.com/moh3n9595).
