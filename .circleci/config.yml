@@ -69,7 +69,7 @@ jobs:
       
       - run:
           name: Android build
-          command: node ./dist/src/bin.js android setting.json
+          command: ts-node ./src/bin.ts android setting.json
   
   rn-init:
     docker:
