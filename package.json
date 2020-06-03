@@ -2,12 +2,15 @@
   "name": "@moh3n95/react-native-app-builder",
   "version": "1.0.0",
   "description": "Multiple builds with different params",
-  "main": "index.js",
-  "types": "index.d.ts",
-  "bin": "bin.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": "./dist/src/bin.js",
   "scripts": {
-    "test-ios": "node ./bin.js ios setting.json",
-    "test-android": "node ./bin.js android setting.json"
+    "test-ios": "ts-node ./src/bin.ts ios setting.json",
+    "test-android": "ts-node ./src/bin.ts android setting.json",
+    "lint": "eslint . --ext .ts,.tsx",
+    "build": "tsc",
+    "pkg": "npm run build && pkg ./dist/src/bin.js --out-path ./pkg"
   },
   "repository": {
     "type": "git",
@@ -31,7 +34,19 @@
     "fs-extra": "^8.1.0"
   },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.1",
+    "@types/jest": "^25.2.3",
+    "@types/node": "^14.0.9",
+    "@typescript-eslint/eslint-plugin": "^3.1.0",
+    "@typescript-eslint/parser": "^2.18.0",
     "eslint": "^6.7.2",
-    "eslint-plugin-import": "^2.19.1"
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-react": "^7.19.0",
+    "prettier": "2.0.1",
+    "ts-jest": "^22.4.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.7.5"
   }
 }

@@ -29,7 +29,7 @@ jobs:
             
       - run:
           name: Eslint
-          command: ./node_modules/.bin/eslint *.js **/*.js
+          command: npm run lint
           
   rn-build-android:
     docker:
@@ -69,7 +69,7 @@ jobs:
       
       - run:
           name: Android build
-          command: node ./bin.js android setting.json
+          command: node ./dist/src/bin.js android setting.json
   
   rn-init:
     docker:
@@ -106,15 +106,19 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}-{{ arch }}
       
       - run:
+          name: TSC
+          command: npm run build
+
+      - run:
           name: Install PKG
           command: sudo npm i -g pkg
             
       - run:
           name: Binary compile
-          command: pkg . --out-path ./binary_builds
+          command: pkg ./dist/src/bin.js --out-path ./pkg
           
       - store_artifacts:
-          path: ./binary_builds
+          path: ./pkg
           
 workflows:
   version: 2
