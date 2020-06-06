@@ -19,6 +19,7 @@ import {
   SettingsFileIOSParamsInterface,
   SettingsFileIOSInterface,
   SettingsFileAndroidInterface,
+  SettingsFileInterface,
 } from "./types";
 
 // Builds for android :
@@ -34,7 +35,7 @@ function buildAndroid(
   const OS = osDetection();
 
   if (!newValues) {
-    console.log(logLine);
+    logLine();
     return resolve();
   }
 
@@ -49,8 +50,11 @@ function buildAndroid(
     );
   }
 
-  console.log(logLine);
-  beautyLog("BUILDING " + newValues.buildName + "...", "info");
+  logLine();
+  beautyLog("building " + newValues.buildName, "info", {
+    boldedTxt: newValues.buildName,
+    loadingLog: true,
+  });
 
   // Set variable :
   try {
@@ -75,7 +79,9 @@ function buildAndroid(
         }
 
         if (stdout.includes("BUILD SUCCESSFUL")) {
-          beautyLog(newValues.buildName + " FINISHED", "success");
+          beautyLog(newValues.buildName + " finished", "success", {
+            boldedTxt: newValues.buildName,
+          });
 
           const newPath = path.join(
             ".",
@@ -123,7 +129,7 @@ function buildIOS(
   const iosBuildPath = `/ios/${ARCHIVE_NAME}.xcarchive`;
   const { value: newValues, done } = iosValueGen.next();
   if (!newValues) {
-    console.log(logLine);
+    logLine();
     return resolve();
   }
 
@@ -138,8 +144,11 @@ function buildIOS(
     );
   }
 
-  console.log(logLine);
-  beautyLog("BUILDING " + newValues.buildName + "...", "info");
+  logLine();
+  beautyLog("building " + newValues.buildName, "info", {
+    boldedTxt: newValues.buildName,
+    loadingLog: true,
+  });
 
   // Set variable :
   try {
@@ -161,7 +170,9 @@ function buildIOS(
         }
 
         if (stdout.includes("ARCHIVE SUCCEEDED")) {
-          beautyLog(newValues.buildName + " FINISHED", "success");
+          beautyLog(newValues.buildName + " finished", "success", {
+            boldedTxt: newValues.buildName,
+          });
           const newPath = path.join(
             ".",
             `/builds/ios/${newValues.buildName}.xcarchive`
@@ -191,7 +202,7 @@ function buildIOS(
 // Main :
 export default function main(
   platform: PlatformInterface,
-  settingFilePath: string
+  settingFilePath: string | SettingsFileInterface
 ): Promise<any> {
   packageInfoLog();
 
@@ -200,11 +211,15 @@ export default function main(
       beautyErrorLog("invalid setting file address!");
       reject(new Error("invalid setting file address!"));
     }
-    const parsedSettingFile = initializeSettingFile(
-      platform,
-      settingFilePath,
-      reject
-    )!;
+
+    let parsedSettingFile: SettingsFileInterface;
+    if (typeof settingFilePath === "string")
+      parsedSettingFile = initializeSettingFile(
+        platform,
+        settingFilePath,
+        reject
+      )!;
+    else parsedSettingFile = settingFilePath;
 
     const [androidValueGen, iosValueGen] = settingFileParameters(
       platform,
@@ -214,7 +229,9 @@ export default function main(
 
     switch (platform) {
       case "android":
-        fs.mkdirSync(buildPathResolver("android"), { recursive: true });
+        fs.mkdirSync(buildPathResolver("android"), {
+          recursive: true,
+        });
         buildAndroid(
           androidValueGen!,
           buildObjectResolver(parsedSettingFile, "android"),
@@ -227,7 +244,9 @@ export default function main(
           beautyErrorLog("ios need mac operating system!");
           return reject(new Error("ios need mac operating system!"));
         }
-        fs.mkdirSync(buildPathResolver("ios"), { recursive: true });
+        fs.mkdirSync(buildPathResolver("ios"), {
+          recursive: true,
+        });
         buildIOS(
           iosValueGen!,
           buildObjectResolver(
@@ -239,12 +258,16 @@ export default function main(
         );
         break;
       case "both":
-        fs.mkdirSync(buildPathResolver("android"), { recursive: true });
+        fs.mkdirSync(buildPathResolver("android"), {
+          recursive: true,
+        });
         buildAndroid(
           androidValueGen!,
           buildObjectResolver(parsedSettingFile, "android"),
           () => {
-            fs.mkdirSync(buildPathResolver("ios"), { recursive: true });
+            fs.mkdirSync(buildPathResolver("ios"), {
+              recursive: true,
+            });
             buildIOS(
               iosValueGen!,
               buildObjectResolver(

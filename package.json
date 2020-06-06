@@ -31,7 +31,8 @@
   "dependencies": {
     "boxen": "^4.1.0",
     "colors": "^1.4.0",
-    "fs-extra": "^8.1.0"
+    "fs-extra": "^8.1.0",
+    "log-update": "^4.0.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
