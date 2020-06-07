@@ -9,8 +9,9 @@ import {
   SettingsFileInterface,
   SettingsFileAndroidBothInterface,
   SettingsFileIOSBothInterface,
-} from "./types";
-import { beautyErrorLog } from "./logs";
+  isSettingsFileIOSBothInterface,
+} from "../types";
+import { beautyErrorLog } from "../Logs";
 import fs from "fs-extra";
 
 // Operating system detection :
@@ -45,33 +46,38 @@ export function* valueGenFunc(
   }
 }
 
-export const buildPathResolver = (
-  platform: PlatformSpecificInterface
-): string => path.join(".", `/builds/${platform}`);
+export function buildPathResolver(platform: PlatformSpecificInterface): string {
+  return path.join(".", `/builds/${platform}`);
+}
 
 // Create obj for builders :
 export function buildObjectResolver(
   mainObj: SettingsFileInterface,
-  platform: PlatformSpecificInterface
-): SettingsFileAndroidInterface | SettingsFileIOSInterface {
-  switch (platform) {
-    case "android":
-      // eslint-disable-next-line no-case-declarations
-      const androidMainObj = mainObj as SettingsFileAndroidBothInterface;
-      return {
-        projectBase: androidMainObj.projectBase,
-        settingFilePath: androidMainObj.settingFilePath,
-      };
-    case "ios":
-      // eslint-disable-next-line no-case-declarations
-      const iosMainObj = mainObj as SettingsFileIOSBothInterface;
-      return {
-        projectBase: iosMainObj.projectBase,
-        settingFilePath: iosMainObj.settingFilePath,
-        workspacePath: iosMainObj.workspacePath,
-        schemePath: iosMainObj.schemePath,
-      };
-  }
+  platform: PlatformSpecificInterface,
+  reject: (reason?: any) => void
+): SettingsFileAndroidInterface | SettingsFileIOSInterface | undefined {
+  if (platform === "ios" && !isSettingsFileIOSBothInterface(mainObj)) {
+    beautyErrorLog("platform conflicts with settingObject");
+    reject(new Error("platform conflicts with settingObject"));
+  } else
+    switch (platform) {
+      case "android":
+        // eslint-disable-next-line no-case-declarations
+        const androidMainObj = mainObj as SettingsFileAndroidBothInterface;
+        return {
+          projectBase: androidMainObj.projectBase,
+          settingFilePath: androidMainObj.settingFilePath,
+        };
+      case "ios":
+        // eslint-disable-next-line no-case-declarations
+        const iosMainObj = mainObj as SettingsFileIOSBothInterface;
+        return {
+          projectBase: iosMainObj.projectBase,
+          settingFilePath: iosMainObj.settingFilePath,
+          workspacePath: iosMainObj.workspacePath,
+          schemePath: iosMainObj.schemePath,
+        };
+    }
 }
 
 // Validate and create platform parameters :

@@ -1,0 +1,13 @@
+{
+  "transform": {
+    "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+  },
+  "testEnvironment": "node",
+  "moduleFileExtensions": [
+    "ts",
+    "js"
+  ],
+  "modulePathIgnorePatterns": ["AppBuilderTest", "src/Logs"],
+  "testPathIgnorePatterns": ["AppBuilderTest", "src/Logs"],
+  "collectCoverageFrom": ["src/Utils/*.ts"]
+}

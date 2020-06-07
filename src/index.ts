@@ -3,7 +3,7 @@ import path from "path";
 import { exec, execSync } from "child_process";
 
 import { PlatformInterface } from "./types/PlatformInterface";
-import { logLine, beautyLog, packageInfoLog, beautyErrorLog } from "./logs";
+import { logLine, beautyLog, packageInfoLog, beautyErrorLog } from "./Logs";
 import { MAX_BUFFER_SIZE, ARCHIVE_NAME } from "./constants";
 
 import {
@@ -12,7 +12,7 @@ import {
   buildObjectResolver,
   settingFileParameters,
   initializeSettingFile,
-} from "./utils";
+} from "./Utils";
 
 import {
   SettingsFileAndroidParamsInterface,
@@ -234,7 +234,7 @@ export default function main(
         });
         buildAndroid(
           androidValueGen!,
-          buildObjectResolver(parsedSettingFile, "android"),
+          buildObjectResolver(parsedSettingFile, "android", reject)!,
           resolve,
           reject
         );
@@ -251,7 +251,8 @@ export default function main(
           iosValueGen!,
           buildObjectResolver(
             parsedSettingFile,
-            "ios"
+            "ios",
+            reject
           ) as SettingsFileIOSInterface,
           resolve,
           reject
@@ -263,8 +264,12 @@ export default function main(
         });
         buildAndroid(
           androidValueGen!,
-          buildObjectResolver(parsedSettingFile, "android"),
+          buildObjectResolver(parsedSettingFile, "android", reject)!,
           () => {
+            if (osDetection() != "MacOS") {
+              beautyErrorLog("ios need mac operating system!");
+              return reject(new Error("ios need mac operating system!"));
+            }
             fs.mkdirSync(buildPathResolver("ios"), {
               recursive: true,
             });
@@ -272,7 +277,8 @@ export default function main(
               iosValueGen!,
               buildObjectResolver(
                 parsedSettingFile,
-                "ios"
+                "ios",
+                reject
               ) as SettingsFileIOSInterface,
               resolve,
               reject

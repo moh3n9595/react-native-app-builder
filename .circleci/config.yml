@@ -30,6 +30,14 @@ jobs:
       - run:
           name: Eslint
           command: npm run lint
+
+      - run:
+          name: Jest
+          command: npm run test
+
+      - run:
+        name: Codecov
+        command: npm run codecov
           
   rn-build-android:
     docker:
