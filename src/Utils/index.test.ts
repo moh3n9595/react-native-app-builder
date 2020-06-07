@@ -5,7 +5,10 @@ import path from "path";
 import {
   PlatformSpecificInterface,
   PlatformInterface,
-  isSettingsFileIOSBothInterface,
+  isSettingsFileIOSInterface,
+  SettingsFileInterface,
+  SettingsFileAndroidBothInterface,
+  SettingsFileIOSBothInterface,
 } from "../types";
 import { beautyErrorLog } from "../Logs";
 import fs from "fs-extra";
@@ -13,7 +16,7 @@ import fs from "fs-extra";
 jest.mock("fs");
 const spy = jest.spyOn(console, "log").mockImplementation();
 
-test("function osDetection()", () => {
+it("function osDetection()", () => {
   const defaultPlatform = "Linux";
   const platforms = [
     { platform: "linux", os: "Linux" },
@@ -85,7 +88,7 @@ it("function buildObjectResolver(mainObj, platform)", () => {
     const platforms: Array<PlatformSpecificInterface> = ["android", "ios"];
 
     platforms.forEach((platform) => {
-      if (platform !== "ios" || isSettingsFileIOSBothInterface(mainObj)) {
+      if (platform !== "ios" || isSettingsFileIOSInterface(mainObj)) {
         expect(
           Utils.buildObjectResolver(mainObj, platform, () => {})
         ).toMatchObject(
@@ -104,7 +107,7 @@ it("function buildObjectResolver(mainObj, platform)", () => {
       } else {
         Utils.buildObjectResolver(mainObj, platform, () => {});
         expect(spy).toHaveBeenLastCalledWith(
-          beautyErrorLog("platform conflicts with settingObject")
+          beautyErrorLog("platform conflicts with settingObject", true)
         );
       }
     });
@@ -116,10 +119,17 @@ it("function initializeSettingFile(platform, address, reject)", () => {
 
   platforms.forEach((platform) => {
     //@ts-ignore
-    fs.readFileSync.mockReturnValue(false);
+    fs.readFileSync.mockReturnValue(undefined);
     Utils.initializeSettingFile(platform, "someSettingAddress", () => {});
     expect(spy).toHaveBeenLastCalledWith(
-      beautyErrorLog("invalid setting file!")
+      beautyErrorLog("Cannot read property 'toString' of undefined", true)
+    );
+
+    //@ts-ignore
+    fs.readFileSync.mockReturnValue(JSON.stringify({ test: "test" }));
+    Utils.initializeSettingFile(platform, "someSettingAddress", () => {});
+    expect(spy).toHaveBeenLastCalledWith(
+      beautyErrorLog("invalid setting file!", true)
     );
 
     const mainObj = {
@@ -136,5 +146,96 @@ it("function initializeSettingFile(platform, address, reject)", () => {
     expect(
       Utils.initializeSettingFile(platform, "someSettingAddress", () => {})
     ).toMatchObject(mainObj);
+  });
+});
+
+it("function settingFileParameters(platform, mainObj, reject)", () => {
+  const platforms: Array<PlatformInterface> = ["android", "ios", "both"];
+  const mainObjs: Array<SettingsFileInterface> = [
+    {
+      projectBase: "projectBase",
+      settingFilePath: "settingFilePath",
+      workspacePath: "workspacePath",
+      schemePath: "schemePath",
+
+      androidParams: [{ buildName: "buildName", storeName: "storeName" }],
+      iosParams: [{ buildName: "buildName", storeName: "storeName" }],
+    },
+    {
+      projectBase: "projectBase",
+      settingFilePath: "settingFilePath",
+
+      androidParams: [{ buildName: "buildName", storeName: "storeName" }],
+    },
+    {
+      projectBase: "projectBase",
+      settingFilePath: "settingFilePath",
+      workspacePath: "workspacePath",
+      schemePath: "schemePath",
+
+      iosParams: [{ buildName: "buildName", storeName: "storeName" }],
+    },
+  ];
+
+  mainObjs.forEach((mainObj) => {
+    platforms.forEach((platform) => {
+      if (platform === "both") {
+        if (!(mainObj as SettingsFileAndroidBothInterface).androidParams) {
+          Utils.settingFileParameters(platform, mainObj, () => {});
+          expect(spy).toHaveBeenLastCalledWith(
+            beautyErrorLog("androidParams is undefined!", true)
+          );
+        } else if (!(mainObj as SettingsFileIOSBothInterface).iosParams) {
+          Utils.settingFileParameters(platform, mainObj, () => {});
+          expect(spy).toHaveBeenLastCalledWith(
+            beautyErrorLog("iosParams is undefined!", true)
+          );
+        } else
+          expect(
+            Utils.settingFileParameters(platform, mainObj, () => {})
+          ).toEqual([
+            Utils.valueGenFunc(
+              (mainObj as SettingsFileAndroidBothInterface).androidParams!
+            ),
+            Utils.valueGenFunc(
+              (mainObj as SettingsFileIOSBothInterface).iosParams!
+            ),
+          ]);
+      }
+
+      if (platform === "android") {
+        if (!(mainObj as SettingsFileAndroidBothInterface).androidParams) {
+          Utils.settingFileParameters(platform, mainObj, () => {});
+          expect(spy).toHaveBeenLastCalledWith(
+            beautyErrorLog("androidParams is undefined!", true)
+          );
+        } else
+          expect(
+            Utils.settingFileParameters(platform, mainObj, () => {})
+          ).toEqual([
+            Utils.valueGenFunc(
+              (mainObj as SettingsFileAndroidBothInterface).androidParams!
+            ),
+            null,
+          ]);
+      }
+
+      if (platform === "ios") {
+        if (!(mainObj as SettingsFileIOSBothInterface).iosParams) {
+          Utils.settingFileParameters(platform, mainObj, () => {});
+          expect(spy).toHaveBeenLastCalledWith(
+            beautyErrorLog("iosParams is undefined!", true)
+          );
+        } else
+          expect(
+            Utils.settingFileParameters(platform, mainObj, () => {})
+          ).toEqual([
+            null,
+            Utils.valueGenFunc(
+              (mainObj as SettingsFileIOSBothInterface).iosParams!
+            ),
+          ]);
+      }
+    });
   });
 });

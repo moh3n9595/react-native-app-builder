@@ -37,7 +37,16 @@ export type SettingsFileIOSBothInterface =
   | SettingsFileIOSInterface
   | (SettingsFileAndroidInterface & SettingsFileIOSInterface);
 
-export const isSettingsFileIOSBothInterface = (
+export const isSettingsFileIOSInterface = (
   x: SettingsFileInterface
 ): x is SettingsFileInterface =>
-  (x as SettingsFileIOSBothInterface).schemePath !== undefined;
+  (x as SettingsFileIOSInterface).projectBase !== undefined &&
+  (x as SettingsFileIOSInterface).settingFilePath !== undefined &&
+  (x as SettingsFileIOSInterface).schemePath !== undefined &&
+  (x as SettingsFileIOSInterface).workspacePath !== undefined;
+
+export const isSettingsFileAndroidInterface = (
+  x: SettingsFileInterface
+): x is SettingsFileInterface =>
+  (x as SettingsFileIOSInterface).projectBase !== undefined &&
+  (x as SettingsFileIOSInterface).settingFilePath !== undefined;

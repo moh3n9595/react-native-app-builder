@@ -9,7 +9,8 @@ import {
   SettingsFileInterface,
   SettingsFileAndroidBothInterface,
   SettingsFileIOSBothInterface,
-  isSettingsFileIOSBothInterface,
+  isSettingsFileIOSInterface,
+  isSettingsFileAndroidInterface,
 } from "../types";
 import { beautyErrorLog } from "../Logs";
 import fs from "fs-extra";
@@ -56,7 +57,7 @@ export function buildObjectResolver(
   platform: PlatformSpecificInterface,
   reject: (reason?: any) => void
 ): SettingsFileAndroidInterface | SettingsFileIOSInterface | undefined {
-  if (platform === "ios" && !isSettingsFileIOSBothInterface(mainObj)) {
+  if (platform === "ios" && !isSettingsFileIOSInterface(mainObj)) {
     beautyErrorLog("platform conflicts with settingObject");
     reject(new Error("platform conflicts with settingObject"));
   } else
@@ -144,24 +145,35 @@ export function initializeSettingFile(
     let parsedSettings;
     switch (platform) {
       case "android":
+        if (!isSettingsFileAndroidInterface(JSON.parse(settings))) {
+          beautyErrorLog("invalid setting file!");
+          reject(new Error("invalid setting file!"));
+        }
         parsedSettings = JSON.parse(settings) as SettingsFileAndroidInterface;
         break;
       case "ios":
+        if (!isSettingsFileIOSInterface(JSON.parse(settings))) {
+          beautyErrorLog("invalid setting file!");
+          reject(new Error("invalid setting file!"));
+        }
         parsedSettings = JSON.parse(settings) as SettingsFileIOSInterface;
         break;
       case "both":
+        if (
+          !isSettingsFileIOSInterface(JSON.parse(settings)) ||
+          !isSettingsFileAndroidInterface(JSON.parse(settings))
+        ) {
+          beautyErrorLog("invalid setting file!");
+          reject(new Error("invalid setting file!"));
+        }
         parsedSettings = JSON.parse(settings) as SettingsFileAndroidInterface &
           SettingsFileIOSInterface;
         break;
     }
 
-    if (!settings) {
-      beautyErrorLog("invalid setting file!");
-      if (reject) reject(new Error("invalid setting file!"));
-    }
     return parsedSettings;
   } catch (e) {
     beautyErrorLog(e);
-    if (reject) reject(e);
+    reject(e);
   }
 }
