@@ -36,8 +36,8 @@ jobs:
           command: npm run test
 
       - run:
-        name: Codecov
-        command: npm run codecov
+          name: Codecov
+          command: npm run codecov
           
   rn-build-android:
     docker:
